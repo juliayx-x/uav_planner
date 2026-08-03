@@ -1,0 +1,16 @@
+import numpy as np
+
+def main():
+    waypoints = []
+    for i in range(10):
+        waypoints.append((i, i*2, i%5))
+    print(waypoints)
+    print(distance_3d(waypoints[3], waypoints[7]))
+
+def distance_3d(p1, p2):
+    dx = p2[0] - p1[0]
+    dy = p2[1] - p1[1]
+    dz = p2[2] - p1[2]
+    return (dx**2 + dy**2 + dz**2) ** 0.5
+
+main() 
