@@ -1,7 +1,23 @@
 import heapq
 import math
+import numpy as np
 import time
 import tracemalloc
+
+
+def path_smoothness(path):
+    if len(path) < 3:
+        return 0
+    changes = 0
+    for i in range(1, len(path) - 1):
+        v1 = np.array(path[i])   - np.array(path[i-1])
+        v2 = np.array(path[i+1]) - np.array(path[i])
+        cos_a = np.dot(v1, v2) / (
+            np.linalg.norm(v1) * np.linalg.norm(v2) + 1e-9
+        )
+        if np.arccos(np.clip(cos_a, -1, 1)) > np.pi / 4:
+            changes += 1
+    return changes
 
 STEP_COSTS = {}
 for dx in (-1, 0, 1):
@@ -59,7 +75,9 @@ class AStarPlanner:
             "time_sec": elapsed,
             "path_length": path_length,
             "peak_memory_bytes": peak,
+            "path_smoothness": path_smoothness(path) if path else None,
         }
+
     
     def search(self) -> list | None:
         start, goal = self.start, self.goal
@@ -107,5 +125,7 @@ class AStarPlanner:
             path.append(node)
         path.reverse()
         return path
+
+
                         
    
