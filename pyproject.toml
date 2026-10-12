@@ -1,0 +1,11 @@
+[project]
+name = "uav_planner"
+version = "0.1.0"
+requires-python = ">=3.10"
+
+[tool.setuptools]
+packages = ["uav_planner", "uav_planner.maps", "uav_planner.planners"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+pythonpath = ["."]
