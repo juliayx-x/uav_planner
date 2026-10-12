@@ -91,6 +91,7 @@ def run_single_trial(algo, grid, start, goal, env_class, density, map_id, trial_
 
     success = path is not None
     path_length = _compute_path_length(path) if success else None
+    smoothness = path_smoothness(path) if success else None
     altitude_utilisation_val = altitude_utilisation(path, grid) if success else None
 
     return {
@@ -105,7 +106,7 @@ def run_single_trial(algo, grid, start, goal, env_class, density, map_id, trial_
         "smoothness": smoothness,
         "success": success,
         "memory_kb": peak_bytes / 1024,
-        "altitude_utilisation": altitude_utilisation,
+        "altitude_utilisation": altitude_utilisation_val,
     }
 
 def _compute_path_length(path):
