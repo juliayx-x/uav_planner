@@ -1,0 +1,159 @@
+================================================================
+  UAV 3D PATH PLANNING — BENCHMARK RESULTS 
+  A* vs RRT* across 4 Environment Classes
+  14,000 trials total (500 per algorithm × environment × density)
+================================================================
+
+
+────────────────────────────────────────────────────────────────
+1. OVERVIEW
+────────────────────────────────────────────────────────────────
+
+  Total trials:       14,000
+  Successful trials:  11,479  (82.0%)
+
+
+────────────────────────────────────────────────────────────────
+2. SUCCESS RATE
+────────────────────────────────────────────────────────────────
+
+  Algorithm    Random    Canyon    Clustered    Maze
+  ─────────────────────────────────────────────────
+  A*           100%      100%      100%         100%
+  RRT*          59.5%     73.2%     99.2%         0%
+
+  Key finding: A* achieves 100% success in all environments.
+  RRT* completely fails in maze environments (0%) due to its
+  straight-line steering being unable to thread 1-voxel-wide
+  corridors. RRT* performs best in clustered environments (99.2%).
+
+
+────────────────────────────────────────────────────────────────
+3. MEAN METRICS (successful trials only)
+────────────────────────────────────────────────────────────────
+
+  PATH LENGTH (voxels) — lower is better
+  ┌───────────┬──────────┬───────────┬───────────┬──────────┐
+  │ Algorithm │  Random  │  Canyon   │ Clustered │   Maze   │
+  ├───────────┼──────────┼───────────┼───────────┼──────────┤
+  │ A*        │   40.18  │   42.74   │   39.69   │ 1398.24  │
+  │ RRT*      │   35.46  │   41.23   │   37.32   │    —     │
+  └───────────┴──────────┴───────────┴───────────┴──────────┘
+  RRT* finds slightly shorter paths where it succeeds (~5–7% shorter).
+  A* maze paths are extremely long (1398 voxels) due to winding corridors.
+
+  PLANNING TIME (ms) — lower is better
+  ┌───────────┬──────────┬───────────┬───────────┬──────────┐
+  │ Algorithm │  Random  │  Canyon   │ Clustered │   Maze   │
+  ├───────────┼──────────┼───────────┼───────────┼──────────┤
+  │ A*        │    39.8  │   101.6   │    63.4   │   424.5  │
+  │ RRT*      │  1767.4  │  1023.3   │  1673.6   │    —     │
+  └───────────┴──────────┴───────────┴───────────┴──────────┘
+  A* is dramatically faster: ~10–44× depending on environment.
+
+  NODES EXPLORED
+  ┌───────────┬──────────┬───────────┬───────────┬──────────┐
+  │ Algorithm │  Random  │  Canyon   │ Clustered │   Maze   │
+  ├───────────┼──────────┼───────────┼───────────┼──────────┤
+  │ A*        │   335.3  │   851.5   │   547.9   │  5553.4  │
+  │ RRT*      │   784.2  │   783.9   │   881.8   │    —     │
+  └───────────┴──────────┴───────────┴───────────┴──────────┘
+
+  SMOOTHNESS (direction changes) — lower is smoother
+  ┌───────────┬──────────┬───────────┬───────────┬──────────┐
+  │ Algorithm │  Random  │  Canyon   │ Clustered │   Maze   │
+  ├───────────┼──────────┼───────────┼───────────┼──────────┤
+  │ A*        │    4.12  │    7.00   │    7.20   │  711.10  │
+  │ RRT*      │    0.09  │    0.32   │    0.13   │    —     │
+  └───────────┴──────────┴───────────┴───────────┴──────────┘
+  RRT* produces dramatically smoother paths (~20–80× fewer direction
+  changes). A* paths in maze are extremely jagged (711 changes).
+
+  ALTITUDE UTILISATION (0–1 scale)
+  ┌───────────┬──────────┬───────────┬───────────┬──────────┐
+  │ Algorithm │  Random  │  Canyon   │ Clustered │   Maze   │
+  ├───────────┼──────────┼───────────┼───────────┼──────────┤
+  │ A*        │   0.450  │   0.648   │   0.552   │  0.544   │
+  │ RRT*      │   0.458  │   0.664   │   0.541   │    —     │
+  └───────────┴──────────┴───────────┴───────────┴──────────┘
+  Both algorithms use altitude similarly; canyon environments
+  naturally drive higher utilisation due to wall structures.
+
+
+────────────────────────────────────────────────────────────────
+4. STATISTICAL ANALYSIS
+────────────────────────────────────────────────────────────────
+
+  TWO-WAY ANOVA (Algorithm × Environment)
+  ─────────────────────────────────────────────────────────────
+  Note: The algorithm main effect (C(algorithm)) produced NaN
+  for all metrics due to RRT*'s 0% success rate in maze making
+  the design matrix rank-deficient. Results for environment
+  main effect and interaction are valid.
+
+  Metric                Env Effect (F)   Interaction (F)   Interaction p
+  ──────────────────────────────────────────────────────────────────────
+  path_length           181.16           0.012             0.988  (n.s.)
+  time_ms               1031.88          1852.09           < 0.001 ★★★
+  nodes_explored        479.87           38.69             < 0.001 ★★★
+  smoothness            204.73           0.048             0.953  (n.s.)
+  altitude_utilisation  350.98           1.479             0.228  (n.s.)
+
+  Interpretation:
+  • Environment type significantly affects every metric.
+  • The algorithm × environment INTERACTION is only significant
+    for time_ms and nodes_explored — meaning how much slower
+    RRT* is depends heavily on which environment it's in.
+  • Path length and smoothness show no significant interaction:
+    the algorithm's advantage is consistent across environments.
+
+
+  COHEN'S D EFFECT SIZES (A* vs RRT*, successful trials only)
+  ─────────────────────────────────────────────────────────────
+  Metric        Random    Canyon    Clustered    Interpretation
+  ──────────────────────────────────────────────────────────────
+  path_length   +0.926    +0.261    +0.493       RRT* shorter (medium–large)
+  time_ms       −4.414    −6.864    −4.546       A* faster (very large)
+
+  Cohen's d convention: small ≥ 0.2, medium ≥ 0.5, large ≥ 0.8
+  Positive d = A* higher; negative d = RRT* higher.
+  The time_ms effect sizes (d ≈ −4.4 to −6.9) are exceptional —
+  the distributions barely overlap.
+
+
+  TUKEY HSD POST-HOC: time_ms across environments
+  ─────────────────────────────────────────────────────────────
+  Pair                  Mean diff (ms)   p-adj     Significant?
+  ──────────────────────────────────────────────────────────────
+  canyon vs clustered   +374.12          < 0.001   YES
+  canyon vs maze        −66.61           0.014     YES
+  canyon vs random      −100.17          < 0.001   YES
+  clustered vs maze     −440.73          < 0.001   YES
+  clustered vs random   −474.29          < 0.001   YES
+  maze vs random        −33.56           0.356     NO
+
+  Clustered has the highest mean time_ms (driven by RRT*'s 1674ms).
+  Maze and random are statistically indistinguishable in planning time.
+
+
+────────────────────────────────────────────────────────────────
+5. TRADE-OFFS
+────────────────────────────────────────────────────────────────
+
+  A* strengths:
+  - 100% success rate across all environments
+  - 10–44× faster planning time
+  - Handles maze environments (RRT* cannot)
+  - Deterministic and predictable
+
+  RRT* strengths:
+  - Around 5–7% shorter paths where it succeeds
+  - 20–80× smoother paths (fewer direction changes)
+  - Better  for real-time trajectory where there is a requirement on smoothness
+
+  Recommendation:
+    For reliability and speed → A*
+    For path quality in open/clustered environments → RRT*
+    For maze/tight-corridor environments → A* only
+
+================================================================
