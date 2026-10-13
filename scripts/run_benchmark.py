@@ -9,6 +9,10 @@ from uav_planner.planners.astar import AStarPlanner
 from uav_planner.planners.rrt_star import RRTStarPlanner, dist_3d
 from uav_planner.paths import RESULTS_DIR
 from tqdm import tqdm
+from uav_planner.maps.random_map import RandomMapGenerator
+from uav_planner.maps.canyon_map import CanyonMapGenerator
+from uav_planner.maps.clustered_map import ClusteredMapGenerator
+from uav_planner.maps.maze_map import MazeMapGenerator
 
 def run_condition(condition, n_maps=10, n_trials_per_map=50, base_seed=0):
     rows = []
@@ -21,7 +25,7 @@ def run_condition(condition, n_maps=10, n_trials_per_map=50, base_seed=0):
         for map_id in range(n_maps):
             map_seed = base_seed + map_id
             grid = generate_map(env, density, map_id, seed=map_seed)
-            start, goal = _pick_start_goal(grid, seed=map_seed)
+            start, goal = _pick_start_goal(grid, env_class=env, seed=map_seed)
 
             for trial_id in range(n_trials_per_map):
                 trial_seed = map_seed * 1000 + trial_id
@@ -39,7 +43,7 @@ CONDITIONS = [
     for algo in ["astar", "rrt_star"]
     for env in ["random", "canyon", "clustered", "maze"]
     for density in ["low", "medium", "high"]
-]
+][12:]
 
 COLUMNS = [
     "algorithm", "env_class", "density", "map_id", "trial_id",
@@ -48,26 +52,23 @@ COLUMNS = [
 ]
 
 def generate_map(env_class, density, map_id, sx=50, sy=50, sz=20, seed=None):
-    """Generate one VoxelGrid instance for the given env_class/density combo.
-
-    env_class controls obstacle *pattern* (random scatter, canyon walls,
-    clustered blobs, maze corridors). density controls obstacle *fraction*.
-    """
-    rng = np.random.default_rng(seed)
-    grid = VoxelGrid(sx=sx, sy=sy, sz=sz)
-
     density_map = {"low": 0.05, "medium": 0.15, "high": 0.30}
     p = density_map[density]
 
     if env_class == "random":
-        mask = rng.random((sx, sy, sz)) < p
-        for (x, y, z) in np.argwhere(mask):
-            grid.set_obstacle(x, y, z)
+        return RandomMapGenerator(seed=seed, density=p).generate(
+            shape=(sx, sy, sz), start=(3,3,2), goal=(sx-3,sy-3,sz-2)
+        )
+    elif env_class == "canyon":
+        return CanyonMapGenerator(seed=seed).generate(shape=(sx, sy, sz))
+    elif env_class == "clustered":
+        return ClusteredMapGenerator(seed=seed).generate(
+            shape=(sx, sy, sz), start=(3,3,2), goal=(sx-3,sy-3,sz-2)
+        )
+    elif env_class == "maze":
+        return MazeMapGenerator(seed=seed).generate(shape=(sx, sy, sz))
     else:
-        # TODO: implement canyon / clustered / maze generators
-        raise NotImplementedError(f"env_class '{env_class}' not yet implemented")
-
-    return grid
+        raise ValueError(f"unknown env_class '{env_class}'")
 
 def run_single_trial(algo, grid, start, goal, env_class, density, map_id, trial_id, seed=None):
     tracemalloc.start()
@@ -80,7 +81,7 @@ def run_single_trial(algo, grid, start, goal, env_class, density, map_id, trial_
     elif algo == "rrt_star":
         rng = np.random.default_rng(seed)
         planner = RRTStarPlanner(grid, start, goal, rng=rng)
-        path = planner.search(max_iters=3000)
+        path = planner.search(max_iters=1000)
         nodes_explored = len(planner.nodes)
     else:
         raise ValueError(f"unknown algo '{algo}'")
@@ -135,14 +136,16 @@ def altitude_utilisation(path, grid):
     return above / len(path)
 
 
-def _pick_start_goal(grid, seed=None, min_dist=None):
+def _pick_start_goal(grid, env_class=None, seed=None, min_dist=None):
+    if env_class == "maze":
+        return (1, 1, 1), (48, 48, 18)
+    
     rng = np.random.default_rng(seed)
     sx, sy, sz = grid.shape
-    min_dist = min_dist or (sx * 0.6)  # require a reasonably long path
-
+    min_dist = min_dist or (sx * 0.6)
     while True:
         start = tuple(int(rng.integers(0, s)) for s in (sx, sy, sz))
-        goal = tuple(int(rng.integers(0, s)) for s in (sx, sy, sz))
+        goal  = tuple(int(rng.integers(0, s)) for s in (sx, sy, sz))
         if not grid.is_free(*start) or not grid.is_free(*goal):
             continue
         if dist_3d(start, goal) >= min_dist:
@@ -178,13 +181,5 @@ def run_all_conditions(conditions=CONDITIONS, n_maps=10, n_trials_per_map=50):
 
 
 if __name__ == "__main__":
-    dry_run_condition = {"algo": "astar", "env": "random", "density": "low"}
+    run_all_conditions()
 
-    t0 = time.perf_counter()
-    df = run_condition(dry_run_condition, n_maps=10, n_trials_per_map=50)
-    elapsed = time.perf_counter() - t0
-
-    print(f"\ndry run took {elapsed:.1f}s for 1 condition (500 trials)")
-    print(f"estimated total for 24 conditions: {elapsed * 24 / 60:.1f} minutes")
-
-    append_condition_results(df)

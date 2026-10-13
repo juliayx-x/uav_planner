@@ -1,0 +1,133 @@
+Total rows: 14000
+Successful trials: 11479
+
+=== SUCCESS RATE ===
+env_class  canyon  clustered  maze  random
+algorithm                                 
+astar       1.000      1.000   1.0   1.000
+rrt_star    0.732      0.992   0.0   0.595
+
+=== MEAN METRICS BY ALGORITHM × ENV ===
+                     path_length   time_ms  nodes_explored  smoothness  altitude_utilisation
+algorithm env_class                                                                         
+astar     canyon          42.742   101.642         851.500       7.000                 0.648
+          clustered       39.694    63.410         547.900       7.200                 0.552
+          maze          1398.240   424.541        5553.400     711.100                 0.544
+          random          40.175    39.811         335.343       4.124                 0.450
+rrt_star  canyon          41.228  1023.264         783.918       0.320                 0.664
+          clustered       37.321  1673.605         881.766       0.133                 0.541
+          random          35.455  1767.365         784.240       0.092                 0.458
+
+=== TWO-WAY ANOVA ===
+C:\Users\julia\ARC\scripts\analyse.py:33: SingularMatrixWarning: The design matrix is rank-deficient. The model parameters are not uniquely determined.
+  model = ols(f'{metric} ~ C(algorithm) * C(env_class)', data=df_s).fit()
+C:\Users\julia\AppData\Local\Python\pythoncore-3.14-64\Lib\site-packages\statsmodels\base\model.py:1988: ValueWarning: covariance of constraints does not have full rank. The number of constraints is 1, but rank is 0
+  res = self.wald_test(
+C:\Users\julia\AppData\Local\Python\pythoncore-3.14-64\Lib\site-packages\statsmodels\base\model.py:2140: RuntimeWarning: invalid value encountered in divide
+  F /= J
+C:\Users\julia\AppData\Local\Python\pythoncore-3.14-64\Lib\site-packages\statsmodels\base\model.py:1988: ValueWarning: covariance of constraints does not have full rank. The number of constraints is 3, but rank is 2
+  res = self.wald_test(
+C:\Users\julia\AppData\Local\Python\pythoncore-3.14-64\Lib\site-packages\statsmodels\base\model.py:1988: ValueWarning: covariance of constraints does not have full rank. The number of constraints is 3, but rank is 2
+  res = self.wald_test(
+
+--- path_length ---
+                                 sum_sq       df         F  PR(>F)
+C(algorithm)                        NaN      1.0       NaN     NaN
+C(env_class)               8.802109e+07      3.0  181.1601  0.0000
+C(algorithm):C(env_class)  5.669490e+03      3.0    0.0117  0.9884
+Residual                   1.857984e+09  11472.0       NaN     NaN
+C:\Users\julia\ARC\scripts\analyse.py:33: SingularMatrixWarning: The design matrix is rank-deficient. The model parameters are not uniquely determined.
+  model = ols(f'{metric} ~ C(algorithm) * C(env_class)', data=df_s).fit()
+C:\Users\julia\AppData\Local\Python\pythoncore-3.14-64\Lib\site-packages\statsmodels\base\model.py:1988: ValueWarning: covariance of constraints does not have full rank. The number of constraints is 1, but rank is 0
+  res = self.wald_test(
+C:\Users\julia\AppData\Local\Python\pythoncore-3.14-64\Lib\site-packages\statsmodels\base\model.py:2140: RuntimeWarning: invalid value encountered in divide
+  F /= J
+C:\Users\julia\AppData\Local\Python\pythoncore-3.14-64\Lib\site-packages\statsmodels\base\model.py:1988: ValueWarning: covariance of constraints does not have full rank. The number of constraints is 3, but rank is 2
+  res = self.wald_test(
+C:\Users\julia\AppData\Local\Python\pythoncore-3.14-64\Lib\site-packages\statsmodels\base\model.py:1988: ValueWarning: covariance of constraints does not have full rank. The number of constraints is 3, but rank is 2
+  res = self.wald_test(
+
+--- time_ms ---
+                                 sum_sq       df          F  PR(>F)
+C(algorithm)                        NaN      1.0        NaN     NaN
+C(env_class)               2.096097e+08      3.0  1031.8786     0.0
+C(algorithm):C(env_class)  3.762217e+08      3.0  1852.0855     0.0
+Residual                   7.767848e+08  11472.0        NaN     NaN
+C:\Users\julia\ARC\scripts\analyse.py:33: SingularMatrixWarning: The design matrix is rank-deficient. The model parameters are not uniquely determined.
+  model = ols(f'{metric} ~ C(algorithm) * C(env_class)', data=df_s).fit()
+C:\Users\julia\AppData\Local\Python\pythoncore-3.14-64\Lib\site-packages\statsmodels\base\model.py:1988: ValueWarning: covariance of constraints does not have full rank. The number of constraints is 1, but rank is 0
+  res = self.wald_test(
+C:\Users\julia\AppData\Local\Python\pythoncore-3.14-64\Lib\site-packages\statsmodels\base\model.py:2140: RuntimeWarning: invalid value encountered in divide
+  F /= J
+C:\Users\julia\AppData\Local\Python\pythoncore-3.14-64\Lib\site-packages\statsmodels\base\model.py:1988: ValueWarning: covariance of constraints does not have full rank. The number of constraints is 3, but rank is 2
+  res = self.wald_test(
+C:\Users\julia\AppData\Local\Python\pythoncore-3.14-64\Lib\site-packages\statsmodels\base\model.py:1988: ValueWarning: covariance of constraints does not have full rank. The number of constraints is 3, but rank is 2
+  res = self.wald_test(
+
+--- nodes_explored ---
+                                 sum_sq       df         F  PR(>F)
+C(algorithm)                        NaN      1.0       NaN     NaN
+C(env_class)               1.810819e+09      3.0  479.8709     0.0
+C(algorithm):C(env_class)  1.460025e+08      3.0   38.6910     0.0
+Residual                   1.443008e+10  11472.0       NaN     NaN
+C:\Users\julia\ARC\scripts\analyse.py:33: SingularMatrixWarning: The design matrix is rank-deficient. The model parameters are not uniquely determined.
+  model = ols(f'{metric} ~ C(algorithm) * C(env_class)', data=df_s).fit()
+C:\Users\julia\AppData\Local\Python\pythoncore-3.14-64\Lib\site-packages\statsmodels\base\model.py:1988: ValueWarning: covariance of constraints does not have full rank. The number of constraints is 1, but rank is 0
+  res = self.wald_test(
+C:\Users\julia\AppData\Local\Python\pythoncore-3.14-64\Lib\site-packages\statsmodels\base\model.py:2140: RuntimeWarning: invalid value encountered in divide
+  F /= J
+C:\Users\julia\AppData\Local\Python\pythoncore-3.14-64\Lib\site-packages\statsmodels\base\model.py:1988: ValueWarning: covariance of constraints does not have full rank. The number of constraints is 3, but rank is 2
+  res = self.wald_test(
+C:\Users\julia\AppData\Local\Python\pythoncore-3.14-64\Lib\site-packages\statsmodels\base\model.py:1988: ValueWarning: covariance of constraints does not have full rank. The number of constraints is 3, but rank is 2
+  res = self.wald_test(
+
+--- smoothness ---
+                                 sum_sq       df         F  PR(>F)
+C(algorithm)                        NaN      1.0       NaN     NaN
+C(env_class)               2.479551e+07      3.0  204.7307   0.000
+C(algorithm):C(env_class)  5.826821e+03      3.0    0.0481   0.953
+Residual                   4.631355e+08  11472.0       NaN     NaN
+C:\Users\julia\ARC\scripts\analyse.py:33: SingularMatrixWarning: The design matrix is rank-deficient. The model parameters are not uniquely determined.
+  model = ols(f'{metric} ~ C(algorithm) * C(env_class)', data=df_s).fit()
+C:\Users\julia\AppData\Local\Python\pythoncore-3.14-64\Lib\site-packages\statsmodels\base\model.py:1988: ValueWarning: covariance of constraints does not have full rank. The number of constraints is 1, but rank is 0
+  res = self.wald_test(
+C:\Users\julia\AppData\Local\Python\pythoncore-3.14-64\Lib\site-packages\statsmodels\base\model.py:2140: RuntimeWarning: invalid value encountered in divide
+  F /= J
+C:\Users\julia\AppData\Local\Python\pythoncore-3.14-64\Lib\site-packages\statsmodels\base\model.py:1988: ValueWarning: covariance of constraints does not have full rank. The number of constraints is 3, but rank is 2
+  res = self.wald_test(
+C:\Users\julia\AppData\Local\Python\pythoncore-3.14-64\Lib\site-packages\statsmodels\base\model.py:1988: ValueWarning: covariance of constraints does not have full rank. The number of constraints is 3, but rank is 2
+  res = self.wald_test(
+
+--- altitude_utilisation ---
+                              sum_sq       df         F  PR(>F)
+C(algorithm)                     NaN      1.0       NaN     NaN
+C(env_class)                 97.2986      3.0  350.9823  0.0000
+C(algorithm):C(env_class)     0.4100      3.0    1.4789  0.2279
+Residual                   1060.0816  11472.0       NaN     NaN
+
+=== COHEN'S D (A* vs RRT*) ===
+
+  path_length:
+    random: d = 0.926  (A* mean=40.17, RRT* mean=35.46)
+    canyon: d = 0.261  (A* mean=42.74, RRT* mean=41.23)
+    clustered: d = 0.493  (A* mean=39.69, RRT* mean=37.32)
+    maze: no data
+
+  time_ms:
+    random: d = -4.414  (A* mean=39.81, RRT* mean=1767.36)
+    canyon: d = -6.864  (A* mean=101.64, RRT* mean=1023.26)
+    clustered: d = -4.546  (A* mean=63.41, RRT* mean=1673.60)
+    maze: no data
+
+=== TUKEY HSD: time_ms across env_class ===
+      Multiple Comparison of Means - Tukey HSD, FWER=0.05      
+===============================================================
+  group1    group2   meandiff p-adj    lower     upper   reject
+---------------------------------------------------------------
+   canyon clustered  374.1243    0.0  326.9506  421.2981   True
+   canyon      maze  -66.6084 0.0143 -123.6354   -9.5814   True
+   canyon    random  -100.165    0.0  -143.689  -56.6409   True
+clustered      maze -440.7327    0.0 -496.3808 -385.0847   True
+clustered    random -474.2893    0.0 -515.9903 -432.5883   True
+     maze    random  -33.5565 0.3564  -86.1464   19.0333  False
+---------------------------------------------------------------
